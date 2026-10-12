@@ -1,0 +1,76 @@
+@model AcxiomCRM.ViewModels.Common.PagedResult<AcxiomCRM.Models.Entities.Opportunity>
+@{
+    ViewData["Title"] = "Opportunity Report";
+    var filter = ViewBag.Filter as AcxiomCRM.ViewModels.ReportFilterViewModel ?? new AcxiomCRM.ViewModels.ReportFilterViewModel();
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <div>
+        <h4 class="fw-bold mb-1">Opportunity Report</h4>
+        <p class="text-muted small mb-0">Analysis of deal amounts, probabilities, expected close dates, and win/loss statuses</p>
+    </div>
+</div>
+
+<!-- Navigation Pills -->
+<div class="card mb-4 border-0 shadow-sm">
+    <div class="card-body p-2 bg-white rounded-3">
+        <ul class="nav nav-pills flex-column flex-sm-row">
+            <li class="nav-item"><a class="nav-link text-dark" asp-action="Pipeline"><i class="bi bi-bar-chart-steps me-1"></i> Pipeline</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" asp-action="Customers"><i class="bi bi-people me-1"></i> Customers</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" asp-action="Leads"><i class="bi bi-funnel me-1"></i> Leads</a></li>
+            <li class="nav-item"><a class="nav-link active" asp-action="Opportunities"><i class="bi bi-currency-dollar me-1"></i> Opportunities</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" asp-action="FollowUps"><i class="bi bi-calendar-check me-1"></i> Follow-Ups</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" asp-action="Conversion"><i class="bi bi-arrow-repeat me-1"></i> Conversion</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" asp-action="UserActivity"><i class="bi bi-person-lines-fill me-1"></i> User Activity</a></li>
+            @if (User.IsInRole(SystemRoles.Admin))
+            {
+                <li class="nav-item"><a class="nav-link text-dark" asp-action="Audit"><i class="bi bi-shield-check me-1"></i> Audit Logs</a></li>
+            }
+        </ul>
+    </div>
+</div>
+
+<div class="crm-card">
+    <div class="table-responsive">
+        <table class="table crm-table">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Opportunity</th>
+                    <th>Customer</th>
+                    <th>Amount ($)</th>
+                    <th>Stage</th>
+                    <th>Probability</th>
+                    <th>Weighted Value ($)</th>
+                    <th>Expected Close</th>
+                    <th>Status</th>
+                    <th>Owner</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Items.Any())
+                {
+                    @foreach (var opp in Model.Items)
+                    {
+                        <tr>
+                            <td><span class="badge bg-light text-dark border">@opp.OpportunityCode</span></td>
+                            <td class="fw-semibold">@opp.OpportunityName</td>
+                            <td>@(opp.Customer?.CustomerName ?? "-")</td>
+                            <td class="fw-bold text-dark">$@opp.Amount.ToString("N0")</td>
+                            <td><span class="badge bg-primary bg-opacity-75">@opp.Stage</span></td>
+                            <td>@opp.Probability%</td>
+                            <td class="text-primary fw-semibold">$@opp.WeightedValue.ToString("N0")</td>
+                            <td>@opp.ExpectedCloseDate.ToString("yyyy-MM-dd")</td>
+                            <td><span class="badge-status @(opp.Status == "Won" ? "badge-won" : opp.Status == "Lost" ? "badge-lost" : "badge-active")">@opp.Status</span></td>
+                            <td>@(opp.AssignedUser?.FullName ?? "Unassigned")</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="10" class="text-center py-4 text-muted">No opportunities found.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

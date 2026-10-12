@@ -1,0 +1,101 @@
+@model AcxiomCRM.ViewModels.ConversionReportSummary
+@{
+    ViewData["Title"] = "Lead Conversion Report";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <div>
+        <h4 class="fw-bold mb-1">Lead Conversion & Outcome Intelligence</h4>
+        <p class="text-muted small mb-0">Analysis of marketing funnel efficiency, lead-to-deal conversion ratios, and generated opportunity values</p>
+    </div>
+</div>
+
+<!-- Navigation Pills -->
+<div class="card mb-4 border-0 shadow-sm">
+    <div class="card-body p-2 bg-white rounded-3">
+        <ul class="nav nav-pills flex-column flex-sm-row">
+            <li class="nav-item"><a class="nav-link text-dark" asp-action="Pipeline"><i class="bi bi-bar-chart-steps me-1"></i> Pipeline</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" asp-action="Customers"><i class="bi bi-people me-1"></i> Customers</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" asp-action="Leads"><i class="bi bi-funnel me-1"></i> Leads</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" asp-action="Opportunities"><i class="bi bi-currency-dollar me-1"></i> Opportunities</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" asp-action="FollowUps"><i class="bi bi-calendar-check me-1"></i> Follow-Ups</a></li>
+            <li class="nav-item"><a class="nav-link active" asp-action="Conversion"><i class="bi bi-arrow-repeat me-1"></i> Conversion</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" asp-action="UserActivity"><i class="bi bi-person-lines-fill me-1"></i> User Activity</a></li>
+            @if (User.IsInRole(SystemRoles.Admin))
+            {
+                <li class="nav-item"><a class="nav-link text-dark" asp-action="Audit"><i class="bi bi-shield-check me-1"></i> Audit Logs</a></li>
+            }
+        </ul>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-sm-6 col-md-3">
+        <div class="kpi-card">
+            <div>
+                <div class="kpi-label">Total Leads Processed</div>
+                <div class="kpi-value mt-1">@Model.TotalLeads</div>
+            </div>
+            <div class="kpi-icon kpi-blue"><i class="bi bi-funnel"></i></div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-3">
+        <div class="kpi-card">
+            <div>
+                <div class="kpi-label">Successfully Converted</div>
+                <div class="kpi-value text-success mt-1">@Model.ConvertedLeads</div>
+            </div>
+            <div class="kpi-icon kpi-green"><i class="bi bi-check-circle"></i></div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-3">
+        <div class="kpi-card">
+            <div>
+                <div class="kpi-label">Conversion Rate</div>
+                <div class="kpi-value text-primary mt-1">@Model.ConversionRate%</div>
+            </div>
+            <div class="kpi-icon kpi-purple"><i class="bi bi-percent"></i></div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-3">
+        <div class="kpi-card">
+            <div>
+                <div class="kpi-label">Converted Deal Value</div>
+                <div class="kpi-value text-dark mt-1">$@Model.ConvertedOpportunityValue.ToString("N0")</div>
+            </div>
+            <div class="kpi-icon kpi-amber"><i class="bi bi-cash-stack"></i></div>
+        </div>
+    </div>
+</div>
+
+<div class="crm-card">
+    <div class="crm-card-header">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-pie-chart-fill me-2 text-primary"></i> Funnel Conversion Ratio Summary</h6>
+    </div>
+    <div class="crm-card-body">
+        <div class="row align-items-center">
+            <div class="col-md-6 mb-3 mb-md-0">
+                <div class="p-3 bg-light rounded-3 border">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="fw-semibold">Converted Customer Accounts:</span>
+                        <span class="fw-bold text-success">@Model.ConvertedLeads</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="fw-semibold">In-Progress / Active Prospects:</span>
+                        <span class="fw-bold text-primary">@Model.ActiveLeads</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="fw-semibold">Lost / Disqualified Leads:</span>
+                        <span class="fw-bold text-danger">@Model.LostLeads</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="text-center p-3">
+                    <h5 class="fw-bold text-primary mb-1">@Model.ConversionRate% Win Rate</h5>
+                    <p class="text-muted small mb-0">Total pipeline generated from converted qualified leads: <strong>$@Model.ConvertedOpportunityValue.ToString("N2")</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

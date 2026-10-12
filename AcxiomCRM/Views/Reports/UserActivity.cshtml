@@ -1,0 +1,75 @@
+@model List<AcxiomCRM.ViewModels.UserActivityReportItem>
+@{
+    ViewData["Title"] = "User Activity Report";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <div>
+        <h4 class="fw-bold mb-1">User Activity & Productivity Report</h4>
+        <p class="text-muted small mb-0">Summary of team sales engagements, calls completed, meetings held, and follow-ups executed</p>
+    </div>
+</div>
+
+<!-- Navigation Pills -->
+<div class="card mb-4 border-0 shadow-sm">
+    <div class="card-body p-2 bg-white rounded-3">
+        <ul class="nav nav-pills flex-column flex-sm-row">
+            <li class="nav-item"><a class="nav-link text-dark" asp-action="Pipeline"><i class="bi bi-bar-chart-steps me-1"></i> Pipeline</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" asp-action="Customers"><i class="bi bi-people me-1"></i> Customers</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" asp-action="Leads"><i class="bi bi-funnel me-1"></i> Leads</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" asp-action="Opportunities"><i class="bi bi-currency-dollar me-1"></i> Opportunities</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" asp-action="FollowUps"><i class="bi bi-calendar-check me-1"></i> Follow-Ups</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" asp-action="Conversion"><i class="bi bi-arrow-repeat me-1"></i> Conversion</a></li>
+            <li class="nav-item"><a class="nav-link active" asp-action="UserActivity"><i class="bi bi-person-lines-fill me-1"></i> User Activity</a></li>
+            @if (User.IsInRole(SystemRoles.Admin))
+            {
+                <li class="nav-item"><a class="nav-link text-dark" asp-action="Audit"><i class="bi bi-shield-check me-1"></i> Audit Logs</a></li>
+            }
+        </ul>
+    </div>
+</div>
+
+<div class="crm-card">
+    <div class="table-responsive">
+        <table class="table crm-table">
+            <thead>
+                <tr>
+                    <th>Team Member</th>
+                    <th>Role</th>
+                    <th>Calls</th>
+                    <th>Meetings</th>
+                    <th>Emails</th>
+                    <th>Tasks</th>
+                    <th>Follow-Ups Completed</th>
+                    <th class="text-end">Total Engagements</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    @foreach (var u in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold text-dark">@u.UserName</td>
+                            <td>
+                                <span class="badge @(u.Role == SystemRoles.Admin ? "bg-danger" : u.Role == SystemRoles.Manager ? "bg-primary" : "bg-success")">
+                                    @u.Role
+                                </span>
+                            </td>
+                            <td>@u.CallsCount</td>
+                            <td>@u.MeetingsCount</td>
+                            <td>@u.EmailsCount</td>
+                            <td>@u.TasksCount</td>
+                            <td class="fw-semibold text-success">@u.FollowUpsCompleted</td>
+                            <td class="text-end fw-bold text-primary fs-6">@u.TotalActivities</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="8" class="text-center py-4 text-muted">No activity records recorded yet.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

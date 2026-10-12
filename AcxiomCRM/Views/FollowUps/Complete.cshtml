@@ -1,0 +1,82 @@
+@model AcxiomCRM.ViewModels.FollowUpCompleteViewModel
+@{
+    ViewData["Title"] = $"Complete Follow-Up - {Model.Subject}";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="crm-card">
+            <div class="crm-card-header bg-success bg-opacity-10">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                    <h5 class="mb-0 fw-bold text-success">Complete Follow-Up Activity</h5>
+                </div>
+                <a asp-action="Index" class="btn btn-sm btn-outline-secondary">Cancel</a>
+            </div>
+            <div class="crm-card-body">
+                <div class="p-3 bg-light rounded-3 border mb-3">
+                    <div class="fw-bold text-dark fs-6">@Model.Subject</div>
+                    <div class="text-muted small mt-1">
+                        Scheduled for: @Model.FollowUpDate.ToString("MMM dd, yyyy HH:mm") &bull; @Model.RelatedInfo
+                    </div>
+                </div>
+
+                <form asp-action="Complete" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="FollowUpId" />
+                    <input type="hidden" asp-for="Subject" />
+                    <input type="hidden" asp-for="RelatedInfo" />
+                    <input type="hidden" asp-for="FollowUpDate" />
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger p-2 small mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="CompletionRemarks" class="form-label"></label>
+                        <textarea asp-for="CompletionRemarks" class="form-control" rows="3" placeholder="Summary of discussion, outcome, customer response..." autofocus></textarea>
+                        <span asp-validation-for="CompletionRemarks" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Option to schedule next follow-up -->
+                    <div class="border rounded-3 p-3 mb-4">
+                        <div class="form-check form-switch mb-2">
+                            <input asp-for="ScheduleNextFollowUp" class="form-check-input" id="nextFollowUpSwitch" onchange="toggleNextFollowUp()" />
+                            <label class="form-check-label fw-bold" for="nextFollowUpSwitch">
+                                Schedule Next Follow-Up Activity
+                            </label>
+                        </div>
+
+                        <div id="nextFollowUpFields" style="display: none;">
+                            <div class="mb-2">
+                                <label asp-for="NextFollowUpSubject" class="form-label"></label>
+                                <input asp-for="NextFollowUpSubject" class="form-control" placeholder="e.g. Follow-up demo call" />
+                                <span asp-validation-for="NextFollowUpSubject" class="text-danger small"></span>
+                            </div>
+                            <div>
+                                <label asp-for="NextFollowUpDate" class="form-label"></label>
+                                <input asp-for="NextFollowUpDate" class="form-control" type="datetime-local" min="@DateTime.Today.ToString("yyyy-MM-ddTHH:mm")" />
+                                <span asp-validation-for="NextFollowUpDate" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-2 border-top">
+                        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-success px-4 fw-semibold shadow-sm">
+                            <i class="bi bi-check2 me-1"></i> Mark as Completed
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function toggleNextFollowUp() {
+            const isChecked = document.getElementById('nextFollowUpSwitch').checked;
+            document.getElementById('nextFollowUpFields').style.display = isChecked ? 'block' : 'none';
+        }
+    </script>
+}

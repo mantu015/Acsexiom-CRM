@@ -1,0 +1,134 @@
+@model AcxiomCRM.ViewModels.Common.PagedResult<AcxiomCRM.Models.Entities.AuditLog>
+@{
+    ViewData["Title"] = "Security & Audit Logs";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <div>
+        <h4 class="fw-bold mb-1">Security & Audit Logs</h4>
+        <p class="text-muted small mb-0">Append-only security log for tracking logins, authorization changes, entity mutations, and administrative activities</p>
+    </div>
+</div>
+
+<!-- Search & Filter Card -->
+<div class="crm-card mb-4">
+    <div class="crm-card-body p-3">
+        <form asp-action="Index" method="get" class="row g-2 align-items-center">
+            <div class="col-md-3">
+                <input type="text" name="userId" class="form-control" placeholder="Search User / Email..." value="@ViewBag.UserId" />
+            </div>
+            <div class="col-md-2">
+                <select name="entityName" class="form-select">
+                    <option value="">All Modules</option>
+                    <option value="Auth" selected="@(ViewBag.EntityName == "Auth")">Auth</option>
+                    <option value="Customer" selected="@(ViewBag.EntityName == "Customer")">Customer</option>
+                    <option value="Lead" selected="@(ViewBag.EntityName == "Lead")">Lead</option>
+                    <option value="Opportunity" selected="@(ViewBag.EntityName == "Opportunity")">Opportunity</option>
+                    <option value="FollowUp" selected="@(ViewBag.EntityName == "FollowUp")">FollowUp</option>
+                    <option value="Activity" selected="@(ViewBag.EntityName == "Activity")">Activity</option>
+                    <option value="User" selected="@(ViewBag.EntityName == "User")">User</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="action" class="form-select">
+                    <option value="">All Actions</option>
+                    <option value="Login" selected="@(ViewBag.Action == "Login")">Login</option>
+                    <option value="Failed Login" selected="@(ViewBag.Action == "Failed Login")">Failed Login</option>
+                    <option value="Logout" selected="@(ViewBag.Action == "Logout")">Logout</option>
+                    <option value="Create" selected="@(ViewBag.Action == "Create")">Create</option>
+                    <option value="Update" selected="@(ViewBag.Action == "Update")">Update</option>
+                    <option value="Delete" selected="@(ViewBag.Action == "Delete")">Delete</option>
+                    <option value="Convert" selected="@(ViewBag.Action == "Convert")">Convert</option>
+                    <option value="Role Change" selected="@(ViewBag.Action == "Role Change")">Role Change</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex gap-1">
+                <input type="date" name="startDate" class="form-control form-control-sm" value="@ViewBag.StartDate" title="Start Date" />
+                <input type="date" name="endDate" class="form-control form-control-sm" value="@ViewBag.EndDate" title="End Date" />
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="crm-card">
+    <div class="table-responsive">
+        <table class="table crm-table">
+            <thead>
+                <tr>
+                    <th>Timestamp (UTC)</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Module</th>
+                    <th>Record ID</th>
+                    <th>Details / Changes</th>
+                    <th>IP Address</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Items.Any())
+                {
+                    @foreach (var log in Model.Items)
+                    {
+                        <tr>
+                            <td class="small text-nowrap">@log.CreatedDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                            <td class="fw-semibold">@(log.UserName ?? "System")</td>
+                            <td>
+                                <span class="badge @(log.Action.Contains("Failed") ? "bg-danger" : log.Action.Contains("Login") ? "bg-info" : log.Action == "Delete" ? "bg-danger" : "bg-secondary")">
+                                    @log.Action
+                                </span>
+                            </td>
+                            <td><span class="badge bg-light text-dark border">@log.EntityName</span></td>
+                            <td class="small text-muted">@(log.RecordId ?? "-")</td>
+                            <td class="small" style="max-width: 350px;">
+                                @if (!string.IsNullOrWhiteSpace(log.Details))
+                                {
+                                    <div class="text-dark">@log.Details</div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(log.NewValue))
+                                {
+                                    <div class="text-muted text-truncate" style="font-size: 0.72rem;">New: @log.NewValue</div>
+                                }
+                            </td>
+                            <td class="small text-muted">@(log.IpAddress ?? "-")</td>
+                            <td>
+                                <span class="badge @(log.Result == "Success" ? "bg-success" : "bg-danger")">
+                                    @log.Result
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="8" class="text-center py-5 text-muted">No audit records found matching your filters.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <div class="p-3 border-top d-flex justify-content-between align-items-center">
+            <span class="small text-muted">Showing page @Model.PageNumber of @Model.TotalPages (@Model.TotalItems total records)</span>
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-page="@(Model.PageNumber - 1)">Previous</a>
+                </li>
+                @for (int p = 1; p <= Model.TotalPages; p++)
+                {
+                    <li class="page-item @(p == Model.PageNumber ? "active" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="@p">@p</a>
+                    </li>
+                }
+                <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-page="@(Model.PageNumber + 1)">Next</a>
+                </li>
+            </ul>
+        </div>
+    }
+</div>

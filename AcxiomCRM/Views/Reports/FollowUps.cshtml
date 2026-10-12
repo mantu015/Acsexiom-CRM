@@ -1,0 +1,74 @@
+@model AcxiomCRM.ViewModels.Common.PagedResult<AcxiomCRM.Models.Entities.FollowUp>
+@{
+    ViewData["Title"] = "Follow-Up Report";
+    var filter = ViewBag.Filter as AcxiomCRM.ViewModels.ReportFilterViewModel ?? new AcxiomCRM.ViewModels.ReportFilterViewModel();
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <div>
+        <h4 class="fw-bold mb-1">Follow-Up Activity Report</h4>
+        <p class="text-muted small mb-0">Overview of planned, completed, missed, and overdue customer engagements</p>
+    </div>
+</div>
+
+<!-- Navigation Pills -->
+<div class="card mb-4 border-0 shadow-sm">
+    <div class="card-body p-2 bg-white rounded-3">
+        <ul class="nav nav-pills flex-column flex-sm-row">
+            <li class="nav-item"><a class="nav-link text-dark" asp-action="Pipeline"><i class="bi bi-bar-chart-steps me-1"></i> Pipeline</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" asp-action="Customers"><i class="bi bi-people me-1"></i> Customers</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" asp-action="Leads"><i class="bi bi-funnel me-1"></i> Leads</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" asp-action="Opportunities"><i class="bi bi-currency-dollar me-1"></i> Opportunities</a></li>
+            <li class="nav-item"><a class="nav-link active" asp-action="FollowUps"><i class="bi bi-calendar-check me-1"></i> Follow-Ups</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" asp-action="Conversion"><i class="bi bi-arrow-repeat me-1"></i> Conversion</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" asp-action="UserActivity"><i class="bi bi-person-lines-fill me-1"></i> User Activity</a></li>
+            @if (User.IsInRole(SystemRoles.Admin))
+            {
+                <li class="nav-item"><a class="nav-link text-dark" asp-action="Audit"><i class="bi bi-shield-check me-1"></i> Audit Logs</a></li>
+            }
+        </ul>
+    </div>
+</div>
+
+<div class="crm-card">
+    <div class="table-responsive">
+        <table class="table crm-table">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Type</th>
+                    <th>Related To</th>
+                    <th>Follow-Up Date</th>
+                    <th>Status</th>
+                    <th>Assigned To</th>
+                    <th>Completion Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Items.Any())
+                {
+                    @foreach (var f in Model.Items)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@f.Subject</td>
+                            <td><span class="badge bg-light text-dark border">@f.FollowUpType</span></td>
+                            <td>
+                                @if (f.Customer != null) { <span>Customer: @f.Customer.CustomerName</span> }
+                                else if (f.Lead != null) { <span>Lead: @f.Lead.LeadName</span> }
+                                else { <span>@f.RelatedType #@f.RelatedId</span> }
+                            </td>
+                            <td>@f.FollowUpDate.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td><span class="badge-status @(f.Status == "Completed" ? "badge-completed" : "badge-planned")">@f.Status</span></td>
+                            <td>@(f.AssignedUser?.FullName ?? "Unassigned")</td>
+                            <td class="small text-muted">@(f.CompletionRemarks ?? "-")</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="7" class="text-center py-4 text-muted">No follow-ups found.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

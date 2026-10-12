@@ -1,0 +1,87 @@
+@model AcxiomCRM.ViewModels.FollowUpFormViewModel
+@{
+    ViewData["Title"] = $"Edit Follow-Up - {Model.Subject}";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="crm-card">
+            <div class="crm-card-header">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-pencil me-2 text-primary"></i> Edit Follow-Up</h5>
+                <a asp-action="Index" class="btn btn-sm btn-outline-secondary">Back to List</a>
+            </div>
+            <div class="crm-card-body">
+                <form asp-action="Edit" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="FollowUpId" />
+                    <input type="hidden" asp-for="RelatedType" />
+                    <input type="hidden" asp-for="RelatedId" />
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger p-2 small mb-3"></div>
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label asp-for="Subject" class="form-label"></label>
+                            <input asp-for="Subject" class="form-control" />
+                            <span asp-validation-for="Subject" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="FollowUpType" class="form-label"></label>
+                            <select asp-for="FollowUpType" class="form-select">
+                                <option value="Call">Phone Call</option>
+                                <option value="Meeting">Meeting</option>
+                                <option value="Email">Email Follow-Up</option>
+                                <option value="Task">Task</option>
+                            </select>
+                            <span asp-validation-for="FollowUpType" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="FollowUpDate" class="form-label"></label>
+                            <input asp-for="FollowUpDate" class="form-control" type="datetime-local" />
+                            <span asp-validation-for="FollowUpDate" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="Status" class="form-label"></label>
+                            <select asp-for="Status" class="form-select">
+                                <option value="Planned">Planned</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Missed">Missed</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                            <span asp-validation-for="Status" class="text-danger small"></span>
+                        </div>
+
+                        @if (User.IsInRole(SystemRoles.Admin) || User.IsInRole(SystemRoles.Manager))
+                        {
+                            <div class="col-md-6">
+                                <label asp-for="AssignedTo" class="form-label"></label>
+                                <select asp-for="AssignedTo" class="form-select" asp-items="ViewBag.SalesExecutives">
+                                    <option value="">-- Select Sales Executive --</option>
+                                </select>
+                                <span asp-validation-for="AssignedTo" class="text-danger small"></span>
+                            </div>
+                        }
+
+                        <div class="col-12">
+                            <label asp-for="Remarks" class="form-label"></label>
+                            <textarea asp-for="Remarks" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Remarks" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4 pt-2 border-top">
+                        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

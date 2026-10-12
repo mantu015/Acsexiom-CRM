@@ -1,0 +1,98 @@
+@model AcxiomCRM.ViewModels.LeadConvertViewModel
+@{
+    ViewData["Title"] = $"Convert Lead - {Model.LeadName}";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="crm-card">
+            <div class="crm-card-header bg-success bg-opacity-10">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-arrow-repeat text-success fs-5"></i>
+                    <h5 class="mb-0 fw-bold text-success">Convert Lead to Customer</h5>
+                </div>
+                <a asp-action="Details" asp-route-id="@Model.LeadId" class="btn btn-sm btn-outline-secondary">Cancel</a>
+            </div>
+            <div class="crm-card-body">
+                <p class="text-muted small">
+                    Converting this lead will promote <strong>@Model.LeadName</strong> to an active Customer record. All past follow-ups and logged activities will be automatically transferred.
+                </p>
+
+                <form asp-action="Convert" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="LeadId" />
+                    <input type="hidden" asp-for="LeadCode" />
+                    <input type="hidden" asp-for="LeadName" />
+                    <input type="hidden" asp-for="Email" />
+                    <input type="hidden" asp-for="Phone" />
+                    <input type="hidden" asp-for="CompanyName" />
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger p-2 small mb-3"></div>
+
+                    <!-- Customer Preview Box -->
+                    <div class="p-3 bg-light rounded-3 border mb-4">
+                        <h6 class="fw-bold mb-2 text-dark"><i class="bi bi-person-check text-primary me-2"></i> New Customer Information</h6>
+                        <div class="row g-2 small">
+                            <div class="col-sm-6"><strong>Name:</strong> @Model.LeadName</div>
+                            <div class="col-sm-6"><strong>Company:</strong> @(Model.CompanyName ?? "N/A")</div>
+                            <div class="col-sm-6"><strong>Email:</strong> @Model.Email</div>
+                            <div class="col-sm-6"><strong>Phone:</strong> @Model.Phone</div>
+                        </div>
+                    </div>
+
+                    <!-- Optional Opportunity Creation -->
+                    <div class="border rounded-3 p-3 mb-4">
+                        <div class="form-check form-switch mb-3">
+                            <input asp-for="CreateOpportunity" class="form-check-input" id="createOppSwitch" onchange="toggleOppFields()" />
+                            <label class="form-check-label fw-bold" for="createOppSwitch">
+                                Also create a Sales Opportunity for this customer
+                            </label>
+                        </div>
+
+                        <div id="oppFieldsContainer">
+                            <div class="mb-3">
+                                <label asp-for="OpportunityName" class="form-label"></label>
+                                <input asp-for="OpportunityName" class="form-control" />
+                                <span asp-validation-for="OpportunityName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label asp-for="OpportunityAmount" class="form-label"></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input asp-for="OpportunityAmount" class="form-control" type="number" step="0.01" />
+                                    </div>
+                                    <span asp-validation-for="OpportunityAmount" class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label asp-for="ExpectedCloseDate" class="form-label"></label>
+                                    <input asp-for="ExpectedCloseDate" class="form-control" type="date" />
+                                    <span asp-validation-for="ExpectedCloseDate" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-2 border-top">
+                        <a asp-action="Details" asp-route-id="@Model.LeadId" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-success px-4 fw-semibold shadow-sm">
+                            <i class="bi bi-check2-circle me-1"></i> Confirm & Convert Lead
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function toggleOppFields() {
+            const isChecked = document.getElementById('createOppSwitch').checked;
+            document.getElementById('oppFieldsContainer').style.display = isChecked ? 'block' : 'none';
+        }
+    </script>
+}

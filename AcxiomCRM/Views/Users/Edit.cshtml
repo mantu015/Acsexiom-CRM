@@ -1,0 +1,60 @@
+@model AcxiomCRM.ViewModels.UserEditViewModel
+@{
+    ViewData["Title"] = $"Edit User - {Model.FullName}";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="crm-card">
+            <div class="crm-card-header">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-pencil me-2 text-primary"></i> Edit User & Role</h5>
+                <a asp-action="Index" class="btn btn-sm btn-outline-secondary">Back to List</a>
+            </div>
+            <div class="crm-card-body">
+                <form asp-action="Edit" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger p-2 small mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="FullName" class="form-label"></label>
+                        <input asp-for="FullName" class="form-control" autofocus />
+                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Role" class="form-label"></label>
+                        <select asp-for="Role" class="form-select" asp-items="ViewBag.Roles"></select>
+                        <span asp-validation-for="Role" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input asp-for="IsActive" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label">Account Active</label>
+                    </div>
+
+                    <div class="form-check mb-4 p-3 bg-light rounded border">
+                        <input asp-for="UnlockAccount" class="form-check-input ms-0 me-2" />
+                        <label asp-for="UnlockAccount" class="form-check-label fw-semibold text-danger">Unlock Account (Resets failed attempts and lockout timer)</label>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-2 border-top">
+                        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
